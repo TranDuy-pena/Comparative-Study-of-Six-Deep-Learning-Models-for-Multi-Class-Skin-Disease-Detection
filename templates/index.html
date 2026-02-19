@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <title>Soft Voting Skin Disease - AI Diagnosis</title>
+  <!-- Bootstrap 5 -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --secondary-color: #3f37c9;
+      --success-color: #4cc9f0;
+      --light-bg: #f8f9fa;
+      --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+    
+    body {
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      padding-bottom: 2rem;
+    }
+    
+    .header {
+      background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+      color: white;
+      border-radius: 0 0 20px 20px;
+      padding: 1.5rem 0;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 12px rgba(67, 97, 238, 0.15);
+    }
+    
+    .header h1 {
+      font-weight: 700;
+      font-size: 2.2rem;
+    }
+    
+    .header p {
+      opacity: 0.9;
+      font-size: 1.1rem;
+    }
+    
+    .card-main {
+      border: none;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 2rem;
+    }
+    
+    .card-header-custom {
+      background-color: white;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      padding: 1.5rem;
+    }
+    
+    .card-body-custom {
+      padding: 2rem;
+    }
+    
+    .upload-area {
+      border: 3px dashed #ddd;
+      border-radius: 15px;
+      padding: 2.5rem 1rem;
+      text-align: center;
+      background-color: var(--light-bg);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .upload-area:hover {
+      border-color: var(--primary-color);
+      background-color: rgba(67, 97, 238, 0.03);
+    }
+    
+    .upload-icon {
+      font-size: 3.5rem;
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+    }
+    
+    .btn-primary-custom {
+      background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+      border: none;
+      border-radius: 12px;
+      padding: 0.8rem 2rem;
+      font-weight: 600;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary-custom:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 7px 15px rgba(67, 97, 238, 0.3);
+    }
+    
+    .image-container {
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      margin-bottom: 1rem;
+    }
+    
+    .image-title {
+      background-color: rgba(0,0,0,0.05);
+      padding: 0.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      text-align: center;
+      margin-top: 0.5rem;
+    }
+    
+    .model-result-card {
+      border-left: 4px solid var(--primary-color);
+      border-radius: 10px;
+      padding: 1.2rem;
+      margin-bottom: 1rem;
+      background-color: white;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+    }
+    
+    .model-name {
+      font-weight: 700;
+      color: var(--primary-color);
+      font-size: 1.1rem;
+    }
+    
+    .final-result-card {
+      background: linear-gradient(to right, #4cc9f0, #4361ee);
+      color: white;
+      border-radius: 15px;
+      padding: 1.5rem;
+      box-shadow: 0 8px 20px rgba(76, 201, 240, 0.3);
+    }
+    
+    .progress {
+      height: 10px;
+      border-radius: 5px;
+      margin-top: 0.5rem;
+    }
+    
+    .progress-bar {
+      border-radius: 5px;
+    }
+    
+    .model-confidence {
+      font-weight: 700;
+      font-size: 1.3rem;
+    }
+    
+    .gradcam-label {
+      display: inline-block;
+      background-color: var(--primary-color);
+      color: white;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    
+    .disease-label {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+    
+    .prediction-time {
+      color: #6c757d;
+      font-size: 0.9rem;
+    }
+    
+    @media (max-width: 768px) {
+      .card-body-custom {
+        padding: 1.5rem;
+      }
+      .header h1 {
+        font-size: 1.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="header">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-8">
+        <h1><i class="fas fa-stethoscope me-3"></i>Soft Voting – Phân loại bệnh da</h1>
+        <p>Hệ thống AI kết hợp nhiều mô hình để chẩn đoán bệnh da liễu chính xác hơn</p>
+      </div>
+      <div class="col-md-4 text-end d-none d-md-block">
+        <div class="badge bg-light text-primary p-3">
+          <i class="fas fa-brain me-2"></i>6 Mô hình AI
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="card card-main">
+        <div class="card-header-custom">
+          <h3 class="mb-0"><i class="fas fa-upload me-2"></i>Tải lên hình ảnh da cần chẩn đoán</h3>
+        </div>
+        <div class="card-body-custom">
+          <form method="POST" enctype="multipart/form-data" class="mb-4" id="uploadForm">
+            <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+              <div class="upload-icon">
+                <i class="fas fa-cloud-upload-alt"></i>
+              </div>
+              <h5>Kéo thả ảnh vào đây hoặc click để chọn</h5>
+              <p class="text-muted">Hỗ trợ định dạng JPG, PNG với kích thước tối đa 5MB</p>
+              <input id="fileInput" class="d-none" type="file" name="image" accept="image/*" onchange="document.getElementById('uploadForm').submit()">
+            </div>
+            <div class="text-center mt-4">
+              <button type="submit" class="btn btn-primary-custom btn-lg">
+                <i class="fas fa-search me-2"></i>Phân tích và Chẩn đoán
+              </button>
+            </div>
+          </form>
+
+          {% if error %}
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Lỗi:</strong> {{ error }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      {% if image_url %}
+      <div class="row">
+        <!-- Original Image and Grad-CAM Visualizations -->
+        <div class="col-lg-6 mb-4">
+          <div class="card card-main">
+            <div class="card-header-custom">
+              <h4 class="mb-0"><i class="fas fa-images me-2"></i>Hình ảnh & Phân tích Grad-CAM</h4>
+            </div>
+            <div class="card-body-custom">
+              <div class="row">
+                <!-- Original Image -->
+                <div class="col-md-6 mb-4">
+                  <h5 class="gradcam-label"><i class="fas fa-image me-1"></i> Ảnh gốc</h5>
+                  <div class="image-container">
+                    <img src="{{ image_url }}" class="img-fluid" alt="Uploaded image">
+                  </div>
+                  <div class="image-title">Hình ảnh đầu vào</div>
+                </div>
+                
+                <!-- Grad-CAM VGG16 -->
+                <div class="col-md-6 mb-4">
+                  <h5 class="gradcam-label"><i class="fas fa-fire me-1"></i> Grad-CAM VGG16</h5>
+                  <div class="image-container">
+                    {% if gradcam_urls and gradcam_urls.vgg %}
+                    <img src="{{ gradcam_urls.vgg }}" class="img-fluid" alt="Grad-CAM VGG16">
+                    {% else %}
+                    <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                      <div class="text-center">
+                        <i class="fas fa-image fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">Grad-CAM visualization</p>
+                      </div>
+                    </div>
+                    {% endif %}
+                  </div>
+                  <div class="image-title">Vùng quan trọng (VGG16)</div>
+                </div>
+                
+                <!-- Grad-CAM ResNet50 -->
+                <div class="col-md-6 mb-4">
+                  <h5 class="gradcam-label"><i class="fas fa-fire me-1"></i> Grad-CAM ResNet50</h5>
+                  <div class="image-container">
+                    {% if gradcam_urls and gradcam_urls.resnet50 %}
+                    <img src="{{ gradcam_urls.resnet50 }}" class="img-fluid" alt="Grad-CAM ResNet50">
+                    {% else %}
+                    <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                      <div class="text-center">
+                        <i class="fas fa-image fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">Grad-CAM visualization</p>
+                      </div>
+                    </div>
+                    {% endif %}
+                  </div>
+                  <div class="image-title">Vùng quan trọng (ResNet50)</div>
+                </div>
+                
+                <!-- Grad-CAM EfficientNet-B4 -->
+                <div class="col-md-6 mb-4">
+                  <h5 class="gradcam-label"><i class="fas fa-fire me-1"></i> Grad-CAM EfficientNet-B4</h5>
+                  <div class="image-container">
+                    {% if gradcam_urls and gradcam_urls.effb4 %}
+                    <img src="{{ gradcam_urls.effb4 }}" class="img-fluid" alt="Grad-CAM EfficientNet-B4">
+                    {% else %}
+                    <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                      <div class="text-center">
+                        <i class="fas fa-image fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">Grad-CAM visualization</p>
+                      </div>
+                    </div>
+                    {% endif %}
+                  </div>
+                  <div class="image-title">Vùng quan trọng (EfficientNet-B4)</div>
+                </div>
+
+                <!-- Grad-CAM EfficientNet-B0 -->
+                <div class="col-md-6 mb-4">
+                  <h5 class="gradcam-label"><i class="fas fa-fire me-1"></i> Grad-CAM EfficientNet-B0</h5>
+                  <div class="image-container">
+                    {% if gradcam_urls and gradcam_urls.effb0 %}
+                    <img src="{{ gradcam_urls.effb0 }}" class="img-fluid" alt="Grad-CAM EfficientNet-B0">
+                    {% else %}
+                    <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                      <div class="text-center">
+                        <i class="fas fa-image fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">Grad-CAM visualization</p>
+                      </div>
+                    </div>
+                    {% endif %}
+                  </div>
+                  <div class="image-title">Vùng quan trọng (EfficientNet-B0)</div>
+                </div>
+
+                <!-- Grad-CAM DenseNet121 -->
+                <div class="col-md-6 mb-4">
+                  <h5 class="gradcam-label"><i class="fas fa-fire me-1"></i> Grad-CAM DenseNet121</h5>
+                  <div class="image-container">
+                    {% if gradcam_urls and gradcam_urls.densenet %}
+                    <img src="{{ gradcam_urls.densenet }}" class="img-fluid" alt="Grad-CAM DenseNet121">
+                    {% else %}
+                    <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                      <div class="text-center">
+                        <i class="fas fa-image fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">Grad-CAM visualization</p>
+                      </div>
+                    </div>
+                    {% endif %}
+                  </div>
+                  <div class="image-title">Vùng quan trọng (DenseNet121)</div>
+                </div>
+
+                <!-- Grad-CAM MobileNetV3 -->
+                <div class="col-md-6 mb-4">
+                  <h5 class="gradcam-label"><i class="fas fa-fire me-1"></i> Grad-CAM MobileNetV3</h5>
+                  <div class="image-container">
+                    {% if gradcam_urls and gradcam_urls.mobilenet %}
+                    <img src="{{ gradcam_urls.mobilenet }}" class="img-fluid" alt="Grad-CAM MobileNetV3">
+                    {% else %}
+                    <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                      <div class="text-center">
+                        <i class="fas fa-image fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">Grad-CAM visualization</p>
+                      </div>
+                    </div>
+                    {% endif %}
+                  </div>
+                  <div class="image-title">Vùng quan trọng (MobileNetV3)</div>
+                </div>
+              </div>
+              
+              <div class="alert alert-info mt-3">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Grad-CAM (Gradient-weighted Class Activation Mapping)</strong> giúp hiển thị vùng nào trong hình ảnh ảnh hưởng nhiều nhất đến quyết định của mô hình AI.
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Model Results -->
+        <div class="col-lg-6 mb-4">
+          <div class="card card-main">
+            <div class="card-header-custom">
+              <h4 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Kết quả phân tích</h4>
+            </div>
+            <div class="card-body-custom">
+              {% if results %}
+              <h5 class="mb-3"><i class="fas fa-microscope me-2"></i>Kết quả từng mô hình:</h5>
+              
+              <!-- VGG16 Result -->
+              <div class="model-result-card">
+                <div class="row align-items-center">
+                  <div class="col-8">
+                    <div class="model-name">VGG16</div>
+                    <div class="disease-label">{{ results.vgg.label }}</div>
+                  </div>
+                  <div class="col-4 text-end">
+                    <div class="model-confidence">{{ (results.vgg.prob * 100) | round(1) }}%</div>
+                  </div>
+                </div>
+                <div class="progress">
+                  <div class="progress-bar bg-primary" role="progressbar" 
+                       style="width: {{ (results.vgg.prob * 100) }}%"></div>
+                </div>
+              </div>
+              
+              <!-- ResNet50 Result -->
+              <div class="model-result-card">
+                <div class="row align-items-center">
+                  <div class="col-8">
+                    <div class="model-name">ResNet50</div>
+                    <div class="disease-label">{{ results.resnet50.label }}</div>
+                  </div>
+                  <div class="col-4 text-end">
+                    <div class="model-confidence">{{ (results.resnet50.prob * 100) | round(1) }}%</div>
+                  </div>
+                </div>
+                <div class="progress">
+                  <div class="progress-bar bg-success" role="progressbar" 
+                       style="width: {{ (results.resnet50.prob * 100) }}%"></div>
+                </div>
+              </div>
+              
+              <!-- EfficientNet-B4 Result -->
+              <div class="model-result-card">
+                <div class="row align-items-center">
+                  <div class="col-8">
+                    <div class="model-name">EfficientNet-B4</div>
+                    <div class="disease-label">{{ results.effb4.label }}</div>
+                  </div>
+                  <div class="col-4 text-end">
+                    <div class="model-confidence">{{ (results.effb4.prob * 100) | round(1) }}%</div>
+                  </div>
+                </div>
+                <div class="progress">
+                  <div class="progress-bar bg-warning" role="progressbar" 
+                       style="width: {{ (results.effb4.prob * 100) }}%"></div>
+                </div>
+              </div>
+
+              <!-- EfficientNet-B0 Result -->
+              <div class="model-result-card">
+                <div class="row align-items-center">
+                  <div class="col-8">
+                    <div class="model-name">EfficientNet-B0</div>
+                    <div class="disease-label">{{ results.effb0.label }}</div>
+                  </div>
+                  <div class="col-4 text-end">
+                    <div class="model-confidence">{{ (results.effb0.prob * 100) | round(1) }}%</div>
+                  </div>
+                </div>
+                <div class="progress">
+                  <div class="progress-bar bg-danger" role="progressbar" 
+                       style="width: {{ (results.effb0.prob * 100) }}%"></div>
+                </div>
+              </div>
+
+              <!-- DenseNet121 Result -->
+              <div class="model-result-card">
+                <div class="row align-items-center">
+                  <div class="col-8">
+                    <div class="model-name">DenseNet121</div>
+                    <div class="disease-label">{{ results.densenet.label }}</div>
+                  </div>
+                  <div class="col-4 text-end">
+                    <div class="model-confidence">{{ (results.densenet.prob * 100) | round(1) }}%</div>
+                  </div>
+                </div>
+                <div class="progress">
+                  <div class="progress-bar bg-info" role="progressbar" 
+                       style="width: {{ (results.densenet.prob * 100) }}%"></div>
+                </div>
+              </div>
+
+              <!-- MobileNetV3 Result -->
+              <div class="model-result-card">
+                <div class="row align-items-center">
+                  <div class="col-8">
+                    <div class="model-name">MobileNetV3</div>
+                    <div class="disease-label">{{ results.mobilenet.label }}</div>
+                  </div>
+                  <div class="col-4 text-end">
+                    <div class="model-confidence">{{ (results.mobilenet.prob * 100) | round(1) }}%</div>
+                  </div>
+                </div>
+                <div class="progress">
+                  <div class="progress-bar bg-secondary" role="progressbar" 
+                       style="width: {{ (results.mobilenet.prob * 100) }}%"></div>
+                </div>
+              </div>
+              
+              <!-- Soft Voting Final Result -->
+              <div class="final-result-card mt-4">
+                <div class="row align-items-center">
+                  <div class="col-8">
+                    <h4 class="mb-1"><i class="fas fa-vote-yea me-2"></i>Kết quả Soft Voting</h4>
+                    <p class="mb-0 opacity-75">Tổng hợp từ 6 mô hình AI</p>
+                  </div>
+                  <div class="col-4 text-end">
+                    <div class="model-confidence" style="font-size: 1.8rem;">{{ (results.soft_vote.prob * 100) | round(1) }}%</div>
+                  </div>
+                </div>
+                <hr class="my-3" style="border-color: rgba(255,255,255,0.2);">
+                <h3 class="mb-2">{{ results.soft_vote.label }}</h3>
+                <div class="progress" style="height: 12px;">
+                  <div class="progress-bar bg-light" role="progressbar" 
+                       style="width: {{ (results.soft_vote.prob * 100) }}%"></div>
+                </div>
+                
+                {% if prediction_time %}
+                <div class="prediction-time mt-3 text-white">
+                  <i class="fas fa-clock me-1"></i> Thời gian dự đoán: {{ prediction_time }} giây
+                </div>
+                {% endif %}
+              </div>
+              
+              <!-- Recommendations -->
+              <div class="alert alert-light border mt-4">
+                <h6><i class="fas fa-lightbulb me-2 text-warning"></i>Khuyến nghị:</h6>
+                <p class="mb-0">Kết quả này được tạo bởi hệ thống AI và chỉ mang tính chất tham khảo. Vui lòng tham khảo ý kiến bác sĩ chuyên khoa để có chẩn đoán chính xác và phương pháp điều trị phù hợp.</p>
+              </div>
+              
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  
+  <!-- Information Footer -->
+  <div class="row mt-5">
+    <div class="col-12 text-center">
+      <div class="text-muted">
+        <p class="mb-0">
+          <i class="fas fa-shield-alt me-1"></i> Hệ thống sử dụng mô hình Soft Voting kết hợp VGG16, ResNet50, EfficientNet-B4, EfficientNet-B0, DenseNet121 và MobileNetV3
+        </p>
+        <p class="small">
+          <i class="fas fa-exclamation-triangle me-1"></i> Đây là công cụ hỗ trợ chẩn đoán, không thay thế bác sĩ chuyên khoa
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Add file name display when a file is selected
+  document.getElementById('fileInput').addEventListener('change', function(e) {
+    const fileName = e.target.files[0]?.name;
+    if (fileName) {
+      const uploadArea = document.querySelector('.upload-area h5');
+      const originalText = uploadArea.textContent;
+      uploadArea.innerHTML = `<i class="fas fa-check-circle me-2 text-success"></i>Đã chọn: ${fileName}`;
+      
+      // Reset after 5 seconds if form isn't submitted
+      setTimeout(() => {
+        if (!document.querySelector('.image-container')) {
+          uploadArea.innerHTML = originalText;
+        }
+      }, 5000);
+    }
+  });
+</script>
+</body>
+</html>

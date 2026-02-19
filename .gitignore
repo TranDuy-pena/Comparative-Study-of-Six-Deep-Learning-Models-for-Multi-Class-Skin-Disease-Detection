@@ -1,0 +1,36 @@
+# ===== Data / Dataset (KHÔNG push) =====
+train/
+test/
+data/
+dataset/
+datasets/
+
+# ===== Python cache =====
+__pycache__/
+*.pyc
+*.pyo
+
+# ===== Virtual env =====
+.venv/
+venv/
+env/
+
+# ===== Jupyter =====
+.ipynb_checkpoints/
+
+# ===== OS/IDE =====
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ===== Secrets =====
+.env
+*.key
+*.pem
+
+# ===== Model/weights  =====
+*.pt
+*.pth
+runs/
+weights/

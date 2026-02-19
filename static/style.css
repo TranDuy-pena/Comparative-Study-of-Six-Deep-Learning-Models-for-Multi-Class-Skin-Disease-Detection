@@ -1,0 +1,11 @@
+body {
+    background: linear-gradient(135deg, #e3f2fd, #fce4ec);
+}
+
+h1 {
+    font-weight: 700;
+}
+
+.card {
+    background-color: #ffffffee;
+}
